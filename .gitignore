@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Virtual environments
+.venv/
+venv/
+.env
+ENV/
+env/
+
+# Data folders
+data/raw/
+data/raw/*
+!data/raw/.gitkeep
+
+# Великі файли даних
+*.csv
+*.xlsx
+*.parquet
+*.h5
+*.pkl
+*.joblib
+
+# IDE
+.idea
