@@ -1,4 +1,4 @@
-# Перелік місць доставки
+# Перелік місць доставки 67
 
 This project analyzes delivery location data to optimize logistics while applying DevOps practices (Git, CI/CD via GitHub/GitLab Actions, Docker, Kubernetes) learned in the "Development Environment and Components in Data Modeling and Analysis" course .
 
