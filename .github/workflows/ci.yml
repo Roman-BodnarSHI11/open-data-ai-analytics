@@ -42,22 +42,18 @@ jobs:
               - 'src/data_load/**'
               - 'src/constants.py'
               - 'requirements.txt'
-              - 'pyproject.toml'
             data_quality_analysis:
               - 'src/data_quality_analysis/**'
               - 'src/constants.py'
               - 'requirements.txt'
-              - 'pyproject.toml'
             data_research:
               - 'src/data_research/**'
               - 'src/constants.py'
               - 'requirements.txt'
-              - 'pyproject.toml'
             visualization:
               - 'src/visualization/**'
               - 'reports/figures/**'
               - 'requirements.txt'
-              - 'pyproject.toml'
 
       # Build a JSON array of modules that will be run.
       - name: Resolve outputs
