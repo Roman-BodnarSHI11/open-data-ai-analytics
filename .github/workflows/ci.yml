@@ -21,19 +21,19 @@ on:
 
 jobs:
   detect-changes:
-    name: Detect changed modules
+    name: Resolve modules to run
     runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_dispatch'
 
     outputs:
-      changed_modules: ${{ steps.collect.outputs.changed_modules }}
+      modules: ${{ steps.result.outputs.modules }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Filter paths by module
-        id: filter
+        id: paths
+        if: github.event_name != 'workflow_dispatch'
         uses: dorny/paths-filter@v3
         with:
           token: ${{ github.token }}
@@ -59,36 +59,45 @@ jobs:
               - 'requirements.txt'
               - 'pyproject.toml'
 
-      - name: Collect changed modules
-        id: collect
+      # Build a JSON array of modules that will be run.
+      - name: Resolve outputs
+        id: result
+        shell: bash
         run: |
-          CHANGED=""
-          if [ "${{ steps.filter.outputs.data_load }}" = "true" ]; then
-            CHANGED="$CHANGED data_load"
+          EVENT="${{ github.event_name }}"
+          INPUT="${{ github.event.inputs.module }}"
+          modules=()
+
+          if [[ "$EVENT" == "workflow_dispatch" ]]; then
+            for mod in data_load data_quality_analysis data_research visualization; do
+              if [[ "$INPUT" == "all" || "$INPUT" == "$mod" ]]; then
+                modules+=("$mod")
+              fi
+            done
+          else
+            [[ "${{ steps.paths.outputs.data_load }}"             == "true" ]] && modules+=("data_load")
+            [[ "${{ steps.paths.outputs.data_quality_analysis }}" == "true" ]] && modules+=("data_quality_analysis")
+            [[ "${{ steps.paths.outputs.data_research }}"         == "true" ]] && modules+=("data_research")
+            [[ "${{ steps.paths.outputs.visualization }}"         == "true" ]] && modules+=("visualization")
           fi
-          if [ "${{ steps.filter.outputs.data_quality_analysis }}" = "true" ]; then
-            CHANGED="$CHANGED data_quality_analysis"
+
+          if [[ ${#modules[@]} -eq 0 ]]; then
+            echo 'modules=[]' >> "$GITHUB_OUTPUT"
+          else
+            json=$(printf ',"%s"' "${modules[@]}")
+            echo "modules=[${json:1}]" >> "$GITHUB_OUTPUT"
           fi
-          if [ "${{ steps.filter.outputs.data_research }}" = "true" ]; then
-            CHANGED="$CHANGED data_research"
-          fi
-          if [ "${{ steps.filter.outputs.visualization }}" = "true" ]; then
-            CHANGED="$CHANGED visualization"
-          fi
-          echo "changed_modules=$CHANGED" >> "$GITHUB_OUTPUT"
 
   run-modules:
+    name: "Run › ${{ matrix.module }}"
     runs-on: ubuntu-latest
     needs: [detect-changes]
+    if: ${{ needs.detect-changes.outputs.modules != '[]' }}
 
     strategy:
       fail-fast: false
       matrix:
-        module: [data_load, data_quality_analysis, data_research, visualization]
-
-    # Якщо workflow_dispatch і обрано конкретний модуль — пропускаємо інші.
-    # При push/pull_request намагаємось не запускати модулі, яких не торкнулися зміни.
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.module == 'all' || github.event.inputs.module == matrix.module)) || (github.event_name != 'workflow_dispatch' && (needs.detect-changes.outputs.changed_modules == '' || contains(needs.detect-changes.outputs.changed_modules, matrix.module))) }}
+        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
 
     steps:
       - name: Checkout
@@ -110,13 +119,11 @@ jobs:
         run: |
           mkdir -p artifacts/${{ matrix.module }}
           echo "Running tests for ${{ matrix.module }}"
-          # Запуск pytest; у майбутньому можна зробити окремі директорії tests/<module>
           pytest -q > artifacts/${{ matrix.module }}/pytest.log 2>&1
 
       - name: Collect additional artifacts
         run: |
           mkdir -p artifacts/${{ matrix.module }}
-          # Для модуля visualization зібрати фігури
           if [ "${{ matrix.module }}" = "visualization" ]; then
             if [ -d "reports/figures" ]; then
               cp -R reports/figures artifacts/visualization/ || true

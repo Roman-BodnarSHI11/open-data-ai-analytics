@@ -4,18 +4,55 @@ on:
   workflow_dispatch:
     inputs:
       module:
-        description: "Which module to run on self-hosted (or 'data_load' by default)"
+        description: "Which module to run (or 'all')"
         required: true
         default: "data_load"
         type: choice
         options:
+          - all
           - data_load
           - data_quality_analysis
           - visualization
 
 jobs:
-  run-on-self-hosted:
+  resolve-modules:
+    name: Resolve modules to run
     runs-on: [self-hosted, linux]
+
+    outputs:
+      modules: ${{ steps.result.outputs.modules }}
+
+    steps:
+      - name: Build JSON array of modules
+        id: result
+        shell: bash
+        run: |
+          INPUT="${{ github.event.inputs.module }}"
+          modules=()
+
+          for mod in data_load data_quality_analysis visualization; do
+            if [[ "$INPUT" == "all" || "$INPUT" == "$mod" ]]; then
+              modules+=("$mod")
+            fi
+          done
+
+          if [[ ${#modules[@]} -eq 0 ]]; then
+            echo 'modules=[]' >> "$GITHUB_OUTPUT"
+          else
+            json=$(printf ',"%s"' "${modules[@]}")
+            echo "modules=[${json:1}]" >> "$GITHUB_OUTPUT"
+          fi
+
+  run-on-self-hosted:
+    name: "Self-hosted › ${{ matrix.module }}"
+    runs-on: [self-hosted, linux]
+    needs: [resolve-modules]
+    if: ${{ needs.resolve-modules.outputs.modules != '[]' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.resolve-modules.outputs.modules) }}
 
     steps:
       - name: Checkout
@@ -34,13 +71,12 @@ jobs:
 
       - name: Run pytest on selected module
         run: |
-          mkdir -p artifacts/${{ github.event.inputs.module }}
-          echo "Running tests for ${{ github.event.inputs.module }} on self-hosted runner"
-          pytest -q > artifacts/${{ github.event.inputs.module }}/pytest.log 2>&1
+          mkdir -p artifacts/${{ matrix.module }}
+          echo "Running tests for ${{ matrix.module }} on self-hosted runner"
+          pytest -q > artifacts/${{ matrix.module }}/pytest.log 2>&1
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: selfhosted-artifacts-${{ github.event.inputs.module }}
-          path: artifacts/${{ github.event.inputs.module }}
-
+          name: selfhosted-artifacts-${{ matrix.module }}
+          path: artifacts/${{ matrix.module }}
