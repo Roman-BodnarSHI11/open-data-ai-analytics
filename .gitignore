@@ -29,3 +29,6 @@ data/raw/*
 
 # IDE
 .idea
+
+# MacOS
+.DS_Store
