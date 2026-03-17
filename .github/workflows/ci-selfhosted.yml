@@ -17,7 +17,7 @@ on:
 jobs:
   resolve-modules:
     name: Resolve modules to run
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
 
     outputs:
       modules: ${{ steps.result.outputs.modules }}
@@ -66,14 +66,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          if [ -f src/requirements.txt ]; then pip install -r src/requirements.txt; fi
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f pyproject.toml ]; then pip install -e .; fi
 
-      - name: Run pytest on selected module
+      - name: Run pytest for module
         run: |
           mkdir -p artifacts/${{ matrix.module }}
-          echo "Running tests for ${{ matrix.module }} on self-hosted runner"
-          pytest -q > artifacts/${{ matrix.module }}/pytest.log 2>&1
+          pytest tests/${{ matrix.module }} \
+            --junitxml=artifacts/${{ matrix.module }}/pytest-report.xml \
+            -q 2>&1 | tee artifacts/${{ matrix.module }}/pytest.log
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
