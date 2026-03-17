@@ -45,7 +45,7 @@ jobs:
 
   run-on-self-hosted:
     name: "Self-hosted › ${{ matrix.module }}"
-    runs-on: [self-hosted, linux]
+    runs-on: [self-hosted, macOS, ARM64]
     needs: [resolve-modules]
     if: ${{ needs.resolve-modules.outputs.modules != '[]' }}
 
