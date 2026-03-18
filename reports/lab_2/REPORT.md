@@ -35,7 +35,7 @@
   1. Checkout репозиторію
   2. Встановлення Python 3.11 із кешем pip (`actions/setup-python@v5`)
   3. Встановлення залежностей із `src/requirements.txt`
-  4. Запуск `pytest` із збереженням JUnit XML-звіту та логу
+  4. Запуск `pytest` із збереженням логу
   5. Збір додаткових артефактів (для `visualization` — копіювання графіків із `reports/figures`)
   6. Публікацію артефактів через `actions/upload-artifact@v4`
 
