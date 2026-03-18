@@ -61,17 +61,20 @@ jobs:
       - name: Verify Python
         run: python3 --version
 
+      - name: Create virtual environment
+        run: python3 -m venv .venv
+
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          if [ -f src/requirements.txt ]; then pip3 install -r src/requirements.txt; fi
-          if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
-          if [ -f pyproject.toml ]; then pip3 install -e .; fi
+          .venv/bin/pip install --upgrade pip
+          if [ -f src/requirements.txt ]; then .venv/bin/pip install -r src/requirements.txt; fi
+          if [ -f requirements.txt ]; then .venv/bin/pip install -r requirements.txt; fi
+          if [ -f pyproject.toml ]; then .venv/bin/pip install -e .; fi
 
       - name: Run pytest for module
         run: |
           mkdir -p artifacts/${{ matrix.module }}
-          python3 -m pytest tests/${{ matrix.module }} \
+          .venv/bin/pytest tests/${{ matrix.module }} \
             --junitxml=artifacts/${{ matrix.module }}/pytest-report.xml \
             -q 2>&1 | tee artifacts/${{ matrix.module }}/pytest.log
 
