@@ -95,3 +95,19 @@
 2. **Попередження `RequestsDependencyWarning` (urllib3 / chardet).** З’являється при завантаженні з CKAN у контейнері; на коректність імпорту не вплинуло. За потреби можна вирівняти версії залежностей у `src/requirements.txt`.
 
 3. **Перевірка стеку без Docker у середовищі розробки.** Локально не всі середовища мають встановлений Docker CLI — фінальну перевірку `docker compose up --build` виконувалось на власній машині користувача.
+
+---
+
+## Вивід команди `git log --oneline --graph --all`
+
+```
+* 33e104d (HEAD -> main, origin/main) docs: enhance Lab 3 report with additional visualizations an
+d quality analysis; add new images for JSON quality and pairplot demonstration
+* 0256b99 chore: update .gitignore to include sample_delivery.csv and enhance README with Docker a
+rchitecture details; refactor constants for environment variable support; update requirements for 
+Flask, SQLAlchemy, and psycopg2-binary
+| * 855affe (origin/docker-init, docker-init) chore: update .gitignore to include sample_delivery.
+csv and enhance README with Docker architecture details; refactor constants for environment variab
+le support; update requirements for Flask, SQLAlchemy, and psycopg2-binary
+|/  
+```
