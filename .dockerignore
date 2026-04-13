@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+*.md
+!README.md
+reports/lab_*
+tests
+.pytest_cache
+.DS_Store
+*.egg-info

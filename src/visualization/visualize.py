@@ -1,9 +1,15 @@
 import os
+
+import matplotlib
+
+matplotlib.use("Agg")
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import List
 import chardet
+
+from constants import REPORTS_DIR
 
 
 def detect_encoding(file_path: str) -> str:
@@ -79,19 +85,9 @@ def read_csv_flexible(file_path: str) -> pd.DataFrame:
 
 
 def get_figures_directory():
-    """
-    Повертає шлях до директорії для збереження графіків
-    """
-    # Отримуємо шлях до кореневої директорії проекту
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(current_dir)  # Піднімаємося на рівень вище з src/
-
-    # Шлях до reports/figures/
-    figures_dir = os.path.join(project_root, 'reports', 'figures')
-
-    # Створюємо директорію, якщо вона не існує
+    """Шлях до каталогу збереження графіків (том / змінна REPORTS_DIR у Docker)."""
+    figures_dir = os.environ.get("FIGURES_DIR", os.path.join(REPORTS_DIR, "figures"))
     os.makedirs(figures_dir, exist_ok=True)
-
     return figures_dir
 
 

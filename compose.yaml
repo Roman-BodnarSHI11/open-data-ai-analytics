@@ -1,0 +1,129 @@
+name: open-data-ai-analytics
+
+networks:
+  analytics:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pipeline_data:
+  pipeline_reports:
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: odaa-postgres
+    environment:
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: analytics
+      POSTGRES_DB: analytics
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - analytics
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analytics -d analytics"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  data_load:
+    build:
+      context: .
+      dockerfile: docker/data_load/Dockerfile
+    container_name: odaa-data-load
+    environment:
+      PIPELINE_DATA_DIR: /data/raw
+      REPORTS_DIR: /reports
+      DATABASE_URL: postgresql+psycopg2://analytics:analytics@db:5432/analytics
+      # Вимкніть завантаження з CKAN (лише локальний CSV у томі): SKIP_DOWNLOAD=1
+      SKIP_DOWNLOAD: "0"
+    volumes:
+      - pipeline_data:/data/raw
+    networks:
+      - analytics
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  data_quality_analysis:
+    build:
+      context: .
+      dockerfile: docker/data_quality_analysis/Dockerfile
+    container_name: odaa-data-quality
+    environment:
+      PIPELINE_DATA_DIR: /data/raw
+      REPORTS_DIR: /reports
+    volumes:
+      - pipeline_data:/data/raw
+      - pipeline_reports:/reports
+    networks:
+      - analytics
+    depends_on:
+      data_load:
+        condition: service_completed_successfully
+    restart: "no"
+
+  data_research:
+    build:
+      context: .
+      dockerfile: docker/data_research/Dockerfile
+    container_name: odaa-data-research
+    environment:
+      PIPELINE_DATA_DIR: /data/raw
+      REPORTS_DIR: /reports
+      DATABASE_URL: postgresql+psycopg2://analytics:analytics@db:5432/analytics
+    volumes:
+      - pipeline_data:/data/raw
+      - pipeline_reports:/reports
+    networks:
+      - analytics
+    depends_on:
+      data_load:
+        condition: service_completed_successfully
+    restart: "no"
+
+  visualization:
+    build:
+      context: .
+      dockerfile: docker/visualization/Dockerfile
+    container_name: odaa-visualization
+    environment:
+      PIPELINE_DATA_DIR: /data/raw
+      REPORTS_DIR: /reports
+      FIGURES_DIR: /reports/figures
+    volumes:
+      - pipeline_data:/data/raw
+      - pipeline_reports:/reports
+    networks:
+      - analytics
+    depends_on:
+      data_load:
+        condition: service_completed_successfully
+    restart: "no"
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    container_name: odaa-web
+    ports:
+      - "8080:8080"
+    environment:
+      REPORTS_DIR: /reports
+      DATABASE_URL: postgresql+psycopg2://analytics:analytics@db:5432/analytics
+    volumes:
+      - pipeline_reports:/reports
+    networks:
+      - analytics
+    depends_on:
+      db:
+        condition: service_healthy
+      data_quality_analysis:
+        condition: service_completed_successfully
+      data_research:
+        condition: service_completed_successfully
+      visualization:
+        condition: service_completed_successfully
+    restart: unless-stopped

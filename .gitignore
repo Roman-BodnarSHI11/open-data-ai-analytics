@@ -15,12 +15,13 @@ ENV/
 env/
 
 # Data folders
-data/raw/
 data/raw/*
 !data/raw/.gitkeep
+!data/raw/sample_delivery.csv
 
 # Великі файли даних
 *.csv
+!data/raw/sample_delivery.csv
 *.xlsx
 *.parquet
 *.h5

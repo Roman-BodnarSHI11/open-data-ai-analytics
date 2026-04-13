@@ -1,0 +1,5 @@
+region,city,location_type,orders_count,avg_delivery_hours
+Київська,Київ,warehouse,1520,18.5
+Львівська,Львів,point,890,22.1
+Одеська,Одеса,point,760,24.3
+Харківська,Харків,warehouse,640,19.8

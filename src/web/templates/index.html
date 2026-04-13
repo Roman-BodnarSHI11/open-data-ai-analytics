@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Open Data Analytics — дашборд</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #1a1a1a; background: #f6f7fb; }
+    body { margin: 0 auto; max-width: 960px; padding: 1.5rem; }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.1rem; margin-top: 2rem; }
+    .card { background: #fff; border-radius: 8px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid #e8e8ef; }
+    th { color: #555; font-weight: 600; }
+    a { color: #1d5f9e; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .err { color: #a40000; }
+    ul.files { columns: 2; margin: 0; padding-left: 1.1rem; }
+    code { background: #eef1f6; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>Результати пайплайну</h1>
+  <p>Дані з PostgreSQL та артефакти зі спільного тому (<code>reports/</code>).</p>
+
+  {% if error %}
+    <div class="card err"><strong>Помилка підключення до БД:</strong> {{ error }}</div>
+  {% endif %}
+
+  <div class="card">
+    <h2>Таблиці в <code>public</code></h2>
+    {% if tables %}
+      <ul>
+        {% for t in tables %}
+          <li><code>{{ t }}</code></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Таблиць немає або БД недоступна.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Імпортовані файли (<code>pipeline_meta</code>)</h2>
+    {% if meta_rows %}
+      <table>
+        <thead><tr><th>Файл</th><th>Таблиця</th><th>Рядків</th><th>Час</th></tr></thead>
+        <tbody>
+          {% for r in meta_rows %}
+            <tr>
+              <td style="word-break:break-all;">{{ r.source_file }}</td>
+              <td><code>{{ r.table_name }}</code></td>
+              <td>{{ r.row_count }}</td>
+              <td>{{ r.created_at }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Записів немає.</p>
+    {% endif %}
+  </div>
+
+  {% if artifacts is defined %}
+    <div class="card">
+      <h2>Звіти та графіки</h2>
+      {% for label, key in [("Якість (JSON)", "quality"), ("Дослідження (MD)", "research"), ("Графіки (PNG)", "figures")] %}
+        <h3 style="margin:1rem 0 0.35rem;">{{ label }}</h3>
+        {% set names = artifacts[key] %}
+        {% if names %}
+          <ul class="files">
+            {% for n in names %}
+              <li><a href="{{ url_for('download_artifact', kind=key, name=n) }}">{{ n }}</a></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p><em>Файлів немає.</em></p>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</body>
+</html>
