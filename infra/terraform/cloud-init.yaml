@@ -1,0 +1,30 @@
+#cloud-config
+
+package_update: true
+package_upgrade: true
+
+# Встановлюємо необхідні пакети для роботи з Docker.
+packages:
+  - ca-certificates
+  - curl
+  - gnupg
+  - git
+
+# Запускаємо набір shell-команд після встановлення пакетів.
+runcmd:
+  # Додаємо офіційний GPG-ключ Docker для безпечної інсталяції.
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  - chmod a+r /etc/apt/keyrings/docker.asc
+  # Додаємо офіційний репозиторій Docker.
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+  - apt-get update
+  # Встановлюємо Docker Engine та Compose plugin.
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  # Запускаємо і вмикаємо Docker як systemd-сервіс.
+  - systemctl enable docker
+  - systemctl start docker
+  # Клонуємо проєкт. ${repo_url} підставляється Terraform через templatefile().
+  - git clone ${repo_url} /opt/open-data-ai-analytics
+  # Запускаємо Docker Compose. Шлях до compose-файлу залежить від структури твого проєкту!
+  - cd /opt/open-data-ai-analytics && docker compose up -d
