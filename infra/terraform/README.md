@@ -38,11 +38,13 @@ terraform apply
 ### 5. Відкрити веб-інтерфейс
 
 \`\`\`bash
+
 Outputs:
 
 public_ip = PUBLIC_IP
 ssh_private_key = ssh
 web_url = PUBLIC_IP
+
 \`\`\`
 
 Скопіювати URL у браузер. Має відкритися інтерфейс застосунку.
