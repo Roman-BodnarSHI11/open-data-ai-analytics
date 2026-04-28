@@ -184,3 +184,17 @@ datasources:
 ## Висновок
 
 Розгорнуто класичний стек спостереження: **Prometheus** збирає метрики з самого себе, **Node Exporter** і **cAdvisor**; **Grafana** отримує дані з Prometheus через provisioned datasource. Інфраструктура в Azure оновлена правилами NSG для доступу до портів веб-UI та моніторингових інтерфейсів; працездатність підтверджена скріншотами контейнерів, сторінки Targets у Prometheus, UI експортерів і тестом підключення в Grafana.
+
+
+## Вивід команди `git log --oneline --graph --all`
+
+```
+* 1c800cd (HEAD -> main, origin/main, origin/HEAD) docs: add Lab 5 report detailing monitoring stack setup with Prometheus, Grafana, Node Exporter, and cAdvisor; include configuration examples and verification screenshots
+* 88e9503 feat: refine Azure network security group configuration by adding outbound rules for Grafana
+* 8216e26 feat: enhance Azure network security group configuration with inbound rules for Grafana
+* 5c2357e feat: add inbound security rule for Grafana in Azure network security group configuration
+* df6f5aa Fix comment for port 8081 mapping
+* 76f6549 chore: add initial monitoring configuration files for Docker, Grafana, and Prometheus
+| * fc99d73 (origin/monitoring, monitoring) chore: add initial monitoring configuration files for Docker, Grafana, and Prometheus
+|/
+```
