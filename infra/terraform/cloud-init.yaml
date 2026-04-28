@@ -26,5 +26,7 @@ runcmd:
   - systemctl start docker
   # Клонуємо проєкт. ${repo_url} підставляється Terraform через templatefile().
   - git clone ${repo_url} /opt/open-data-ai-analytics
-  # Запускаємо Docker Compose. Шлях до compose-файлу залежить від структури твого проєкту!
+  # Запускаємо Docker Compose.
   - cd /opt/open-data-ai-analytics && docker compose up -d
+  # Піднімаємо стек моніторингу з підпапки monitoring/
+  - cd /opt/open-data-ai-analytics/monitoring && docker compose -f docker-compose.monitoring.yml up -d
