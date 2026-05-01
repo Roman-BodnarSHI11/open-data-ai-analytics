@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openapp-html
+  namespace: openapp
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="uk">
+    <head>
+      <meta charset="UTF-8">
+      <title>Open Data AI Analytics — GitOps Demo</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+          max-width: 800px;
+          margin: 50px auto;
+          padding: 20px;
+          background: #f5f7fa;
+        }
+        h1 { color: #2c3e50; }
+        .version {
+          background: #3498db;
+          color: white;
+          padding: 15px;
+          border-radius: 8px;
+          font-size: 18px;
+          margin-top: 20px;
+        }
+        .info { color: #7f8c8d; margin-top: 30px; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <h1>Open Data AI Analytics</h1>
+      <p>Застосунок розгорнутий через GitOps з використанням Argo CD та k3s.</p>
+      <div class="version">Версія: v1 — початкове розгортання</div>
+      <p class="info">Ця сторінка обслуговується nginx у поді Kubernetes. Вміст береться з ConfigMap, який синхронізується з GitHub-репозиторію.</p>
+    </body>
+    </html>
