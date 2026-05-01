@@ -103,6 +103,18 @@ resource "azurerm_network_security_group" "nsg" {
     destination_address_prefix = "*"
   }
 
+  security_rule {
+    name                       = "ArgoCDUI"
+    priority                   = 1006
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "30443"
+    source_address_prefix      = "*"
+    йdestination_address_prefix = "*"
+  }
+
 }
 
 resource "azurerm_network_interface" "nic" {

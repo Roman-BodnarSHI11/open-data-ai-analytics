@@ -8,6 +8,11 @@ output "web_url" {
   description = "URL для доступу до веб-інтерфейсу"
 }
 
+output "argocd_url" {
+  value       = "http://${azurerm_public_ip.pip.ip_address}:30443"
+  description = "URL для доступу до Argo CD UI"
+}
+
 output "ssh_private_key" {
   value     = tls_private_key.ssh.private_key_pem
   sensitive = true
