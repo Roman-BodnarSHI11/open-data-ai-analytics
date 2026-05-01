@@ -127,7 +127,7 @@ GitOps-розгортання застосунку в Kubernetes (k3s) за до
 15. Автоматично оновлений застосунок після sync.
 ![Крок 15: app auto update](../gitops_lab/app_auto_update.png)
 
-16. Revert-коміт у Git для повернення попереднього стану.
+16. Revert-коміт у Git для повернення попереднього стану. (Застосування команди ```git revert HEAD```)
 ![Крок 16: revert git](../gitops_lab/revert_git.png)
 
 17. Після синхронізації Argo CD знову показує стабільний стан.
