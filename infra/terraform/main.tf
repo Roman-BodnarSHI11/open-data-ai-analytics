@@ -112,7 +112,7 @@ resource "azurerm_network_security_group" "nsg" {
     source_port_range          = "*"
     destination_port_range     = "30443"
     source_address_prefix      = "*"
-    йdestination_address_prefix = "*"
+    destination_address_prefix = "*"
   }
 
 }
