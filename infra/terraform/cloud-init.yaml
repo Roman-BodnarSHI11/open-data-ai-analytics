@@ -30,3 +30,6 @@ runcmd:
   - cd /opt/open-data-ai-analytics && docker compose up -d
   # Піднімаємо стек моніторингу з підпапки monitoring/
   - cd /opt/open-data-ai-analytics/monitoring && docker compose -f docker-compose.monitoring.yml up -d
+  # k3s автоматично запускає API-сервер, controller-manager, scheduler і kubelet
+  - curl -sfL https://get.k3s.io | sh -
+  - chmod 644 /etc/rancher/k3s/k3s.yaml
