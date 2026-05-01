@@ -15,7 +15,7 @@ spec:
       labels:
         app: openapp
       annotations:
-        config-version: "v1"
+        config-version: "v2"
     spec:
       containers:
         - name: nginx
