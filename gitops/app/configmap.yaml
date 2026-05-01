@@ -33,7 +33,7 @@ data:
     <body>
       <h1>Open Data AI Analytics</h1>
       <p>Застосунок розгорнутий через GitOps з використанням Argo CD та k3s.</p>
-      <div class="version">Версія: v2 — оновлено через GitOps автоматично</div>
+      <div class="version">Версія: v1 — початкове розгортання</div>
       <p class="info">Ця сторінка обслуговується nginx у поді Kubernetes. Вміст береться з ConfigMap, який синхронізується з GitHub-репозиторію.</p>
     </body>
     </html>
